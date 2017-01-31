@@ -5,6 +5,8 @@ from enum import Enum
 from stock_exchange import StockExchange
 from datetime import datetime
 
+__author__ = 'Nikitas Papangelopoulos'
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +34,7 @@ class TradeRecord(object):
         """
         logger.debug('Recording a new trade')
         # boolean to check if everything went OK.
-        created_successfully = True
+        self.created_successfully = True
 
         # Assigning stock symbol.
         self.stock_symbol = stock_symbol
@@ -42,7 +44,7 @@ class TradeRecord(object):
             self.quantity = int(quantity)
         except ValueError:
             logger.error('Quantity of shares must be a numerical value. You entered: {}'.format(quantity))
-            created_successfully = False
+            self.created_successfully = False
             # sys.exit(1)
             # return False
 
@@ -52,7 +54,7 @@ class TradeRecord(object):
         except KeyError:
             logger.error('Attempted to record a trade with invalid type: {}. Valid types are: {}'
                          .format(trade_type, TradeRecord.TradeType.__members__.keys()))#, exc_info=True)
-            created_successfully = False
+            self.created_successfully = False
             # sys.exit(1)
             # return False
 
@@ -61,7 +63,7 @@ class TradeRecord(object):
             self.traded_price = float(traded_price)
         except ValueError:
             logger.error('Traded price of shares must be a numerical value. You entered: {}'.format(traded_price))
-            created_successfully = False
+            self.created_successfully = False
             # sys.exit(1)
             # return False
 
@@ -72,20 +74,20 @@ class TradeRecord(object):
                 self.time_stamp = datetime.strptime(time_stamp, '%Y-%m-%d %H:%M:%S')
             except ValueError:
                 logger.error('Timestamp provided must be in the following format "Y-m-d H:M:S". You entered: {}'.format(time_stamp))
-                created_successfully = False
+                self.created_successfully = False
                 # sys.exit(1)
                 # return False
         else:
-            self.time_stamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.time_stamp = datetime.strptime(str(datetime.now())[:-7], '%Y-%m-%d %H:%M:%S')
 
         # Assigning current_stock_exchange value.
         if isinstance(current_stock_exchange, StockExchange):
             self.current_stock_exchange = current_stock_exchange
         else:
             logger.error('Argument "current_stock_exchange" must be of type stock_exchange.StockExchange. You provided: {}'.format(current_stock_exchange))
-            created_successfully = False
+            self.created_successfully = False
 
-        if created_successfully:
+        if self.created_successfully:
             logger.info('Successfully created new trade with attributes stock_symbol: {}, quantity: {}, trade_type: {}, traded_price: {}, time_stamp: {}.'
                         .format(self.stock_symbol, self.quantity, self.trade_type, self.traded_price, self.time_stamp))
             self.current_stock_exchange.add_new_trade(self)

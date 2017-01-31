@@ -2,6 +2,7 @@ import logging
 import numpy as np
 from datetime import datetime, timedelta
 
+__author__ = 'Nikitas Papangelopoulos'
 
 logger = logging.getLogger(__name__)
 # Constant to use for time frame when calculating the volume weighted stock price.
@@ -19,7 +20,6 @@ class StockExchange(object):
         logger.info('Successfully created new stock exchange with attributes name: {}.'.format(self.name))
 
     def add_new_trade(self, trade_to_add):
-
         # Checking if the stock is registered in the market before recording a trade.
         if self.is_stock_registered(trade_to_add.stock_symbol):
 
@@ -32,23 +32,29 @@ class StockExchange(object):
             else:
                 self.recorded_trades[trade_to_add.stock_symbol] = [trade_to_add]
             logger.info('Recorded new trade: {}, in stock_exchange with timestamp {}.'.format(trade_to_add.stock_symbol, trade_to_add.time_stamp))
+            return True
         else:
             logger.info('Then retry recording the trade')
+            return False
 
     def remove_trade(self, trade_to_remove):
         self.recorded_trades[trade_to_remove.stock_symbol].remove(trade_to_remove)
         # If no trades are left for the specific stock, remove the key:value completely.
         if len(self.recorded_trades[trade_to_remove.stock_symbol]) == 0:
             self.recorded_trades.pop(trade_to_remove.stock_symbol)
-        logger.info('Removed stock: {}, from stock_exchange'.format(trade_to_remove.stock_symbol))
+        logger.info('Removed trade for stock: {}, from stock_exchange'.format(trade_to_remove.stock_symbol))
+        return True
+        #TODO: implement check for existing trade
 
     def add_new_stock(self, stock_to_add):
         # Checking if the stock is already registered.
         if not self.is_stock_registered(stock_to_add.stock_symbol, True):
             self.registered_stocks[stock_to_add.stock_symbol] = stock_to_add
             logger.info('Added new stock: {}, to stock_exchange'.format(stock_to_add.stock_symbol))
+            return True
         else:
-            logger.info('Please remove it first.')
+            logger.debug('Please remove it first.')
+            return False
 
     def update_stock_price(self, trade_to_add):
         if self.registered_stocks[trade_to_add.stock_symbol].current_price_timestamp:
@@ -56,11 +62,14 @@ class StockExchange(object):
                 self.registered_stocks[trade_to_add.stock_symbol].current_price = trade_to_add.traded_price
                 self.registered_stocks[trade_to_add.stock_symbol].current_price_timestamp = trade_to_add.time_stamp
                 logger.debug("Successfully updated stock price, for stock: {}. New price: {}".format(trade_to_add.stock_symbol, trade_to_add.traded_price))
+                return True
         else:
             # Case when this is the first time a stock price is set.
             self.registered_stocks[trade_to_add.stock_symbol].current_price = trade_to_add.traded_price
             self.registered_stocks[trade_to_add.stock_symbol].current_price_timestamp = trade_to_add.time_stamp
             logger.debug("Successfully updated stock price, for stock: {}. New price: {}".format(trade_to_add.stock_symbol, trade_to_add.traded_price))
+            return True
+        return False
 
     def is_stock_registered(self, stock_symbol_to_check, adding_created_stock=False):
         if stock_symbol_to_check in self.registered_stocks.keys():
@@ -84,12 +93,18 @@ class StockExchange(object):
         return False
 
     def remove_existing_stock(self, stock_to_remove):
-        self.registered_stocks.pop(stock_to_remove.stock_symbol)
-        logger.info('Removed stock: {}, from stock_exchange'.format(stock_to_remove.stock_symbol))
+        if self.is_stock_registered(stock_to_remove.stock_symbol):
+            self.registered_stocks.pop(stock_to_remove.stock_symbol)
+            logger.info('Removed stock: {}, from stock_exchange'.format(stock_to_remove.stock_symbol))
+            return True
+        return False
 
     def remove_existing_stock_by_symbol(self, stock_symbol):
-        self.registered_stocks.pop(stock_symbol)
-        logger.info('Removed stock: {}, from stock_exchange'.format(stock_symbol))
+        if self.is_stock_registered(stock_symbol):
+            self.registered_stocks.pop(stock_symbol)
+            logger.info('Removed stock: {}, from stock_exchange'.format(stock_symbol))
+            return True
+        return False
 
     def dividend_yield_calculator(self, stock_symbol, stock_price):
         """
