@@ -172,7 +172,6 @@ class StockExchange(object):
 
     def vw_stock_price_calculator(self, stock_symbol):
         volume_weighted_price = None
-
         starting_time = datetime.today() - timedelta(minutes=MINUTES_FOR_VW_PRICE)
         # Collecting trades for this particular stock over the specified time frame.
         latest_trades = [trade for trade in self.recorded_trades[stock_symbol] if trade.time_stamp > starting_time]
