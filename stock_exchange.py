@@ -2,7 +2,10 @@ import logging
 import numpy as np
 from datetime import datetime, timedelta
 
+
 logger = logging.getLogger(__name__)
+# Constant to use for time frame when calculating the volume weighted stock price.
+MINUTES_FOR_VW_PRICE = 15
 
 
 class StockExchange(object):
@@ -168,16 +171,18 @@ class StockExchange(object):
             return None
 
     def vw_stock_price_calculator(self, stock_symbol):
-        up = 0.0
-        down = 0.0
-        starting_time = datetime.today() - timedelta(minutes=15)
+        volume_weighted_price = None
+
+        starting_time = datetime.today() - timedelta(minutes=MINUTES_FOR_VW_PRICE)
         # Collecting trades for this particular stock over the specified time frame.
-        [trade for trade in self.recorded_trades[stock_symbol] if trade.time_stamp > starting_time]
-        for trade in self.recorded_trades[stock_symbol]:
-            if trade.time_stamp > starting_time:
-                up += trade.traded_price*trade.quantity
-                down += trade.quantity
+        latest_trades = [trade for trade in self.recorded_trades[stock_symbol] if trade.time_stamp > starting_time]
+        if latest_trades:
+            # Getting the denominator. reduce/lambda is used only for knowledge demonstration purposes. sum() is simpler
+            denominator = float(reduce(lambda x, y: x+y, [trade.quantity for trade in latest_trades]))
+            # Calculating the volume weighted stock price.
+            volume_weighted_price = sum([np.round(np.divide(np.multiply(trade.traded_price, trade.quantity), denominator), decimals=3) for trade in latest_trades])
+            logger.info('Successfully calculated the volume weighted price {} for stock: {}'.format(volume_weighted_price, stock_symbol))
+        else:
+            logger.info('No trades found for stock: {} in the last: {} nimutes. Unable to calculate volume weighted price.'.format(stock_symbol, MINUTES_FOR_VW_PRICE))
 
-        print up/down
-
-        pass
+        return volume_weighted_price
