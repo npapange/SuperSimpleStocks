@@ -34,17 +34,50 @@ class StockExchange(object):
             logger.info('Recorded new trade: {}, in stock_exchange with timestamp {}.'.format(trade_to_add.stock_symbol, trade_to_add.time_stamp))
             return True
         else:
-            logger.info('Then retry recording the trade')
+            logger.info('Then retry recording the trade.')
             return False
 
     def remove_trade(self, trade_to_remove):
-        self.recorded_trades[trade_to_remove.stock_symbol].remove(trade_to_remove)
-        # If no trades are left for the specific stock, remove the key:value completely.
-        if len(self.recorded_trades[trade_to_remove.stock_symbol]) == 0:
-            self.recorded_trades.pop(trade_to_remove.stock_symbol)
-        logger.info('Removed trade for stock: {}, from stock_exchange'.format(trade_to_remove.stock_symbol))
-        return True
-        #TODO: implement check for existing trade
+        # Checking if trade of that symbol exist in the stock exchange.
+        if self.recorded_trades[trade_to_remove.stock_symbol]:
+            try:
+                self.recorded_trades[trade_to_remove.stock_symbol].remove(trade_to_remove)
+                # If no trades are left for the specific stock, remove the key:value completely.
+                if len(self.recorded_trades[trade_to_remove.stock_symbol]) == 0:
+                    self.recorded_trades.pop(trade_to_remove.stock_symbol)
+                logger.info('Removed trade for stock: {}, from stock_exchange.'.format(trade_to_remove.stock_symbol))
+                return True
+            except ValueError:
+                logger.warning('Could not remove trade. It was not found in the stock_exchange.')
+                return False
+        else:
+            logger.warning('Could not remove trade. No trades in the stock_exchange for stock: {}.'.format(trade_to_remove.stock_symbol))
+            return False
+
+    def remove_trade_by_symbol_date(self, trade_stock_symbol, trade_timestamp):
+        """
+        A method to remove a specific trade from the exchange, by using the stock symbol and timestamp as unique
+        identifiers. This requires that no two trades dor the same stock, happened at the same time. In the opposite
+        case, it will remove only the first one.
+        :param trade_stock_symbol: the symbol (abbreviated name) of the stock
+        :type trade_stock_symbol: str
+        :param trade_timestamp: the timestamp when the trade occurred.
+        :type trade_stock_symbol: datetime
+        :return: a boolean for whether the operation completed successfully.
+        :rtype: bool
+        """
+        # Checking if trade of that symbol exist in the stock exchange.
+        if self.recorded_trades[trade_stock_symbol]:
+            # Using the date to match the trade for removal.
+            matched_trades = [trade for trade in self.recorded_trades[trade_stock_symbol] if str(trade.time_stamp) == trade_timestamp]
+            if matched_trades:
+                self.remove_trade(matched_trades[0])
+            else:
+                logger.warning('Could not remove trade. No trades in the stock_exchange for stock: {} and timestamp.'.format(trade_stock_symbol, trade_timestamp))
+            return False
+        else:
+            logger.warning('Could not remove trade. No trades in the stock_exchange for stock: {}.'.format(trade_stock_symbol))
+            return False
 
     def add_new_stock(self, stock_to_add):
         # Checking if the stock is already registered.
@@ -185,18 +218,30 @@ class StockExchange(object):
             logger.warning('Stock exchange is empty. Please register some stocks first, record some trades and then retry.')
             return None
 
-    def vw_stock_price_calculator(self, stock_symbol):
+    def vw_stock_price_calculator(self, stock_symbol, time_span=None):
         volume_weighted_price = None
-        starting_time = datetime.today() - timedelta(minutes=MINUTES_FOR_VW_PRICE)
-        # Collecting trades for this particular stock over the specified time frame.
-        latest_trades = [trade for trade in self.recorded_trades[stock_symbol] if trade.time_stamp > starting_time]
-        if latest_trades:
-            # Getting the denominator. reduce/lambda is used only for knowledge demonstration purposes. sum() is simpler
-            denominator = float(reduce(lambda x, y: x+y, [trade.quantity for trade in latest_trades]))
-            # Calculating the volume weighted stock price.
-            volume_weighted_price = sum([np.round(np.divide(np.multiply(trade.traded_price, trade.quantity), denominator), decimals=3) for trade in latest_trades])
-            logger.info('Successfully calculated the volume weighted price {} for stock: {}'.format(volume_weighted_price, stock_symbol))
+        if not time_span:
+            time_span = MINUTES_FOR_VW_PRICE
         else:
-            logger.info('No trades found for stock: {} in the last: {} nimutes. Unable to calculate volume weighted price.'.format(stock_symbol, MINUTES_FOR_VW_PRICE))
+            # In case of user provided time span, checking if it is a valid number
+            try:
+                time_span = int(time_span)
+            except ValueError:
+                logger.error('Time span must be a numerical value. You entered: {}'.format(time_span))
+                return False
+
+        starting_time = datetime.today() - timedelta(minutes=time_span)
+        # Checking if the stock is registered in the stock exchange.
+        if self.is_stock_registered(stock_symbol):
+            # Collecting trades for this particular stock over the specified time frame.
+            latest_trades = [trade for trade in self.recorded_trades[stock_symbol] if trade.time_stamp > starting_time]
+            if latest_trades:
+                # Getting the denominator. reduce/lambda is used only for knowledge demonstration purposes. sum() is simpler
+                denominator = float(reduce(lambda x, y: x+y, [trade.quantity for trade in latest_trades]))
+                # Calculating the volume weighted stock price.
+                volume_weighted_price = sum([np.round(np.divide(np.multiply(trade.traded_price, trade.quantity), denominator), decimals=3) for trade in latest_trades])
+                logger.info('Successfully calculated the volume weighted price {} for stock: {}'.format(volume_weighted_price, stock_symbol))
+            else:
+                logger.info('No trades found for stock: {} in the last: {} nimutes. Unable to calculate volume weighted price.'.format(stock_symbol, MINUTES_FOR_VW_PRICE))
 
         return volume_weighted_price
