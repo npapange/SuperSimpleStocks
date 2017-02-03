@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import logging
 import numpy as np
 from datetime import datetime, timedelta
@@ -26,10 +28,9 @@ class StockExchange(object):
             # Updating the stock price and timestamp only if it is newer than the existing.
             self.update_stock_price(trade_to_add)
 
-            # Adding the trade
-            if trade_to_add.stock_symbol in self.recorded_trades.keys():
+            try:
                 self.recorded_trades[trade_to_add.stock_symbol].append(trade_to_add)
-            else:
+            except KeyError:
                 self.recorded_trades[trade_to_add.stock_symbol] = [trade_to_add]
             logger.info('Recorded new trade: {}, in stock_exchange with timestamp {}.'.format(trade_to_add.stock_symbol, trade_to_add.time_stamp))
             return True
