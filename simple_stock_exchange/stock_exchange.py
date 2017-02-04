@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 __author__ = 'Nikitas Papangelopoulos'
 
 logger = logging.getLogger(__name__)
+
 # Constant to use for time frame when calculating the volume weighted stock price.
 MINUTES_FOR_VW_PRICE = 15
 
@@ -28,9 +29,9 @@ class StockExchange(object):
             # Updating the stock price and timestamp only if it is newer than the existing.
             self.update_stock_price(trade_to_add)
 
-            try:
+            if trade_to_add.stock_symbol in self.recorded_trades:
                 self.recorded_trades[trade_to_add.stock_symbol].append(trade_to_add)
-            except KeyError:
+            else:
                 self.recorded_trades[trade_to_add.stock_symbol] = [trade_to_add]
             logger.info('Recorded new trade: {}, in stock_exchange with timestamp {}.'.format(trade_to_add.stock_symbol, trade_to_add.time_stamp))
             return True
@@ -40,7 +41,7 @@ class StockExchange(object):
 
     def remove_trade(self, trade_to_remove):
         # Checking if trade of that symbol exist in the stock exchange.
-        if self.recorded_trades[trade_to_remove.stock_symbol]:
+        if trade_to_remove.stock_symbol in self.recorded_trades:
             try:
                 self.recorded_trades[trade_to_remove.stock_symbol].remove(trade_to_remove)
                 # If no trades are left for the specific stock, remove the key:value completely.
@@ -68,11 +69,12 @@ class StockExchange(object):
         :rtype: bool
         """
         # Checking if trade of that symbol exist in the stock exchange.
-        if self.recorded_trades[trade_stock_symbol]:
+        if trade_stock_symbol in self.recorded_trades:
             # Using the date to match the trade for removal.
             matched_trades = [trade for trade in self.recorded_trades[trade_stock_symbol] if str(trade.time_stamp) == trade_timestamp]
             if matched_trades:
                 self.remove_trade(matched_trades[0])
+                return True
             else:
                 logger.warning('Could not remove trade. No trades in the stock_exchange for stock: {} and timestamp.'.format(trade_stock_symbol, trade_timestamp))
             return False

@@ -1,14 +1,12 @@
 #!/usr/bin/python
 
-import argparse
-import logging.config
 import sys
-from simple_stock_exchange import Stock, TradeRecord, StockExchange
 
+from simple_stock_exchange import Stock, TradeRecord, StockExchange
 
 __author__ = 'Nikitas Papangelopoulos'
 
-logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
+# logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 
 stock_exchange = None
 
@@ -359,10 +357,18 @@ def calculate_volume_weighted_price():
         user_provided_args = [arg.strip() for arg in user_provided_args.split(',') if arg]
         # vw_stock_price_calculator() can be called with 1 or 2 arguments (default 15 minutes time span or user defined)
         try:
+            volume_weighted_price = ''
+            minutes = 0
             if len(user_provided_args) < 2:
-                stock_exchange.vw_stock_price_calculator(user_provided_args[0])
+                volume_weighted_price = stock_exchange.vw_stock_price_calculator(user_provided_args[0])
+                minutes = 15
             elif len(user_provided_args) == 2:
-                stock_exchange.vw_stock_price_calculator(user_provided_args[0], user_provided_args[1])
+                minutes = user_provided_args[1]
+                volume_weighted_price = stock_exchange.vw_stock_price_calculator(user_provided_args[0], minutes)
+
+            print 'Volume weighted price for stock: {} and time period: {} minutes, is: {}'.format(
+                user_provided_args[0], minutes, volume_weighted_price)
+
         except TypeError as error:
             print error
             # Retrying
@@ -402,18 +408,3 @@ def exit_program(user_input):
     if user_input in ['q', '']:
         print 'Exiting the program'
         sys.exit(0)
-
-
-if __name__ == '__main__':
-    # Getting the user's input.
-    parser = argparse.ArgumentParser(
-        description='A to sort a csv file based on a column and save the result to an output csv file')
-    parser.add_argument('-m', '--use-method',
-                        choices=['create_exchange_market', 'create_stock', 'add_stock', 'remove_stock', 'add_trade',
-                                 'remove_trade', 'calculate_dividend', 'calculate_p_e_ratio',
-                                 'calculate_volume_weighted_price', 'calculate_all_share_index'], required=True,
-                        help='Choose the method that you would like to run')
-    args = parser.parse_args()
-
-    main(args.use_method)
-    main('calculate_all_share_index')
