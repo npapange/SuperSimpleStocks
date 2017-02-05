@@ -7,6 +7,10 @@ from api import console_api
 
 __author__ = 'Nikitas Papangelopoulos'
 
+"""
+A script to run console_api.
+"""
+
 logging.config.fileConfig('/SuperSimpleStocks/logging.conf', disable_existing_loggers=False)
 
 # Getting the user's input.

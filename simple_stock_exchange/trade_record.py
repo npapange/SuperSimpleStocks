@@ -13,6 +13,10 @@ logger = logging.getLogger(__name__)
 
 
 class TradeRecord(object):
+    """
+    A class to model a trade for a specific stock that can be added in a StockExchange object.
+    """
+
     # An enum to save the stock type.
     TradeType = Enum('TradeType', 'buy sell')
 

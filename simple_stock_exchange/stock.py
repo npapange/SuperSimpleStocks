@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class Stock(object):
+    """
+    A class to model a stock that can be added in a StockExchange object.
+    """
     # An enum to save the stock type.
     StockType = Enum('StockType', 'common preferred')
 

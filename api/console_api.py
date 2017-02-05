@@ -8,6 +8,10 @@ __author__ = 'Nikitas Papangelopoulos'
 
 # logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 
+"""
+A simple api to access and use the methods of stock_exchange from the command line.
+"""
+
 stock_exchange = None
 
 

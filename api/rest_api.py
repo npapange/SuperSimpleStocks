@@ -10,6 +10,10 @@ from simple_stock_exchange import StockExchange, Stock, TradeRecord
 
 __author__ = 'Nikitas Papangelopoulos'
 
+"""
+A simple api to access and use the methods of stock_exchange via a REST API.
+"""
+
 # logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 
 app = Flask(__name__)
