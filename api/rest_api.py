@@ -1,11 +1,6 @@
-# sys.path.insert(0, os.path.abspath(".."))
 from flask import Flask, request, jsonify, abort, make_response
 
 from simple_stock_exchange import StockExchange, Stock, TradeRecord
-
-# from simple_stock_exchange.stock_exchange import StockExchange
-# from simple_stock_exchange.stock import Stock
-# from simple_stock_exchange.trade_record import TradeRecord
 
 
 __author__ = 'Nikitas Papangelopoulos'
@@ -13,8 +8,6 @@ __author__ = 'Nikitas Papangelopoulos'
 """
 A simple api to access and use the methods of stock_exchange via a REST API.
 """
-
-# logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 
 app = Flask(__name__)
 
@@ -24,7 +17,10 @@ stock_exchange = None
 @app.route('/api/create_stock_exchange', methods=['POST'])
 def create_stock_exchange():
     """
-    A rest wrapper for StockExchange
+    A POST rest wrapper for StockExchange
+    Example usage: {
+                    "name": "New_Stock_exchange"
+                    }
     """
     global stock_exchange
 
@@ -42,7 +38,6 @@ def create_stock_exchange():
                 try:
                     stock_exchange = StockExchange(name)
                     return jsonify({'Stock Exchange': stock_exchange.name}), 200
-
                 except TypeError as error:
                     abort(500, error)
         else:
@@ -54,7 +49,13 @@ def create_stock_exchange():
 @app.route('/api/create_stock', methods=['POST'])
 def create_stock():
     """
-    A rest wrapper for stock.Stock()
+    A POST rest wrapper for stock.Stock()
+    Example usage: {
+                  "stock_symbol": "POP",
+                  "stock_type": "common",
+                  "last_dividend": "8",
+                  "par_value": "100"
+                   }
     """
     required_params = ['stock_symbol', 'stock_type', 'last_dividend', 'par_value']
     json_request = request.json
@@ -88,7 +89,13 @@ def create_stock():
 @app.route('/api/add_stock', methods=['POST'])
 def add_stock():
     """
-    A rest wrapper for StockExchange.add_new_stock()
+    A POST rest wrapper for StockExchange.add_new_stock()
+    Example usage: {
+              "stock_symbol": "POP",
+              "stock_type": "common",
+              "last_dividend": "8",
+              "par_value": "100"
+               }
     """
     check_stock_exchange()
 
@@ -129,7 +136,10 @@ def add_stock():
 @app.route('/api/remove_stock', methods=['POST'])
 def remove_stock():
     """
-    A rest wrapper for StockExchange.remove_existing_stock_by_symbol().
+    A POST rest wrapper for StockExchange.remove_existing_stock_by_symbol().
+    Example usage: {
+              "stock_symbol": "POP",
+               }
     """
     check_stock_exchange()
 
@@ -155,7 +165,14 @@ def remove_stock():
 @app.route('/api/add_trade', methods=['POST'])
 def add_trade():
     """
-    A rest wrapper for StockExchange.add_new_trade()
+    A POST rest wrapper for StockExchange.add_new_trade()
+    Example usage: {
+                    "stock_symbol": "POP",
+                    "quantity": "300",
+                    "trade_type": "buy",
+                    "traded_price": "150",
+                    "time_stamp": "2017-02-04 23:30:39"
+                    }
     """
     check_stock_exchange()
 
@@ -197,7 +214,11 @@ def add_trade():
 @app.route('/api/remove_trade', methods=['POST'])
 def remove_trade():
     """
-    A rest wrapper for StockExchange.remove_trade_by_symbol_date().
+    A POST rest wrapper for StockExchange.remove_trade_by_symbol_date().
+    Example usage: {
+                    "stock_symbol": "POP",
+                    "time_stamp": "2017-02-04 23:30:39"
+                    }
     """
     check_stock_exchange()
 
@@ -228,7 +249,11 @@ def remove_trade():
 @app.route('/api/calculate_dividend', methods=['POST'])
 def calculate_dividend():
     """
-    A rest wrapper for StockExchange.dividend_yield_calculator()
+    A POST rest wrapper for StockExchange.dividend_yield_calculator()
+    Example usage: {
+                  "stock_symbol": "POP",
+                  "stock_price": "130"
+                   }
     """
     check_stock_exchange()
 
@@ -258,7 +283,11 @@ def calculate_dividend():
 @app.route('/api/calculate_p_e_ratio', methods=['POST'])
 def calculate_p_e_ratio():
     """
-    A rest wrapper for StockExchange.p_e_ratio_calculator()
+    A POST rest wrapper for StockExchange.p_e_ratio_calculator()
+    Example usage: {
+                  "stock_symbol": "POP",
+                  "stock_price": "130"
+                   }
     """
     check_stock_exchange()
 
@@ -288,7 +317,10 @@ def calculate_p_e_ratio():
 @app.route('/api/calculate_volume_weighted_price', methods=['POST'])
 def calculate_volume_weighted_price():
     """
-    A rest wrapper for StockExchange.vw_stock_price_calculator()
+    A POST rest wrapper for StockExchange.vw_stock_price_calculator()
+    Example usage: {
+                  "stock_symbol": "POP",
+                   }
     """
     check_stock_exchange()
 
@@ -329,7 +361,9 @@ def calculate_volume_weighted_price():
 @app.route('/api/calculate_all_share_index', methods=['POST'])
 def calculate_all_share_index():
     """
-    A rest wrapper for StockExchange.all_share_index_calculator()
+    A POST rest wrapper for StockExchange.all_share_index_calculator()
+    Example usage: {
+                   }
     """
     check_stock_exchange()
     # Testing if the underlying code in StockExchange.all_share_index_calculator() executed successfully.
@@ -359,7 +393,6 @@ def not_found(error):
     :param error: A custom error message
     :type error: BadRequest
     """
-    print type(error)
     return make_response(jsonify({'error': error.description}), 400)
 
 
@@ -380,6 +413,3 @@ def not_found(error):
     """
     return make_response(jsonify({'error': error.description}), 404)
 
-#
-# if __name__ == '__main__':
-#     app.run()

@@ -22,6 +22,7 @@ class Stock(object):
                  current_stock_exchange=None):
         """
         The constructor, to create a new stock for the stock exchange.
+        Example usage: Stock('GIN', 'preferred', '8', '100', '0.02')
         :param stock_symbol: the symbol (abbreviated name) of the stock
         :type stock_symbol: str
         :param stock_type: the type of the stock
@@ -75,11 +76,15 @@ class Stock(object):
             logger.error('Fixed dividend must be a numerical value. You entered: {}'.format(fixed_dividend))
             self.created_successfully = False
 
-            # If the type is preferred, a fixed dividend must be always provided.
-            if self.stock_type is 'preferred' and self.fixed_dividend is None:
+        # If the type is preferred, a fixed dividend must be always provided.
+        try:
+            if self.stock_type == 'preferred' and self.fixed_dividend is None:
                 logger.error("You provided a 'preferred' stock type. You must also provided a fixed_dividend")
                 self.created_successfully = False
-                # sys.exit(1)
+        except AttributeError:
+            logger.error('Attempted to add stock with invalid type: {}. Valid types are: {}'
+                         .format(stock_type, Stock.StockType.__members__.keys()))  # , exc_info=True)
+            self.created_successfully = False
 
         # Assigning par value.
         try:

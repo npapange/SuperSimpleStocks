@@ -23,6 +23,7 @@ class TradeRecord(object):
     def __init__(self, current_stock_exchange, stock_symbol, quantity, trade_type, traded_price, time_stamp=None):
         """
         The constructor, to create a new trade for some stock in the stock exchange.
+        Example Usage: trade = TradeRecord(StockExchange('example'), 'TEA', '500', 'sell', '150', '2017-02-05 22:14:39')
         :param current_stock_exchange: An optional StockExchange object, in which to register the stock.
         :type current_stock_exchange: StockExchange
         :param stock_symbol: the symbol (abbreviated name) of the stock
@@ -56,7 +57,7 @@ class TradeRecord(object):
             self.trade_type = TradeRecord.TradeType[trade_type].name
         except KeyError:
             logger.error('Attempted to record a trade with invalid type: {}. Valid types are: {}'
-                         .format(trade_type, TradeRecord.TradeType.__members__.keys()))  # , exc_info=True)
+                         .format(trade_type, TradeRecord.TradeType.__members__.keys()))
             self.created_successfully = False
 
         # Assigning traded price of shares traded.

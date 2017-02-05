@@ -135,7 +135,7 @@ class StockExchange(object):
         :param trade_stock_symbol: the symbol (abbreviated name) of the stock.
         :type trade_stock_symbol: str
         :param trade_timestamp: the timestamp when the trade occurred.
-        :type trade_stock_symbol: datetime
+        :type trade_timestamp: str
         :return: True || False, whether the trade was removed successfully from the stock exchange.
         :rtype: bool
         """
@@ -250,17 +250,15 @@ class StockExchange(object):
                 # Checking the type of the stock to use the correct equation.
                 if current_stock.stock_type == 'common':
                     logger.debug('Calculating dividend yield, for common stock type.')
-                    dividend = np.round(np.divide(current_stock.last_dividend, validated_price), decimals=2)
-
+                    dividend = np.round(np.divide(current_stock.last_dividend, validated_price), decimals=3)
                 elif current_stock.stock_type == 'preferred':
                     logger.debug('Calculating dividend yield, for preferred stock type.')
                     dividend = np.round(
                         np.divide(np.multiply(current_stock.fixed_dividend, current_stock.par_value), validated_price),
-                        decimals=2)
-
+                        decimals=3)
                 logger.info('Successfully calculated dividend yield: {}, for stock: {} and price: {}'
                             .format(dividend, stock_symbol, stock_price))
-
+                current_stock.dividend_yield = dividend
         return dividend
 
     def p_e_ratio_calculator(self, stock_symbol, stock_price):
@@ -282,21 +280,20 @@ class StockExchange(object):
             validated_price = StockExchange.is_stock_price_valid(stock_price)
             if validated_price:
 
-                # Checking if the dividend yield has already been successfully calculated for the specific stock
-                if current_stock.dividend_yield == '':
-                    logger.debug(
-                        'Dividend yield has not yet been calculated for stock: {}. Calculating...'.format(stock_symbol))
-                    dividend = self.dividend_yield_calculator(stock_symbol, stock_price)
-                else:
-                    logger.debug('Dividend yield has been calculated for stock: {}. Retrieving...'.format(stock_symbol))
-                    dividend = current_stock.dividend_yield
+                # Checking the type of the stock to use the correct equation.
+                if current_stock.stock_type == 'common':
+                    logger.debug('Calculating dividend, for common stock type.')
+                    denominator = current_stock.last_dividend
+                elif current_stock.stock_type == 'preferred':
+                    logger.debug('Calculating dividend, for preferred stock type.')
+                    denominator = np.multiply(current_stock.fixed_dividend, current_stock.par_value)
 
-                # Catering for dividend = None.
                 try:
-                    p_e_ratio = np.round(np.divide(validated_price, dividend), decimals=2)
-                    logger.info('Successfully calculated P/E ratio: {}, for stock: {} and price: {}'.format(p_e_ratio,
-                                                                                                            stock_symbol,
-                                                                                                            stock_price))
+                    # Post process to avoid division by zero.
+                    if denominator != 0.0:
+                        p_e_ratio = np.round(np.divide(validated_price, denominator), decimals=3)
+                        logger.info('Successfully calculated P/E ratio: {}, for stock: {} '
+                                    'and price: {}'.format(p_e_ratio, stock_symbol, stock_price))
                 except TypeError as error:
                     logger.error('Tried to calculate P/E ratio, but got error: {}'.format(error))
 
@@ -329,6 +326,8 @@ class StockExchange(object):
         A method to calculate the volume weighted price of a stock, for a given time frame.
         :param stock_symbol: the symbol (abbreviated name) of the stock
         :type stock_symbol: str
+        :param time_span: A user provided time span in minutes
+        :type time_span: str
         :return: the volume weighted price value or None, if for some reason the calculation failed.
         :rtype: float | None
         """
