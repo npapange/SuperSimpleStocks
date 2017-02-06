@@ -23,13 +23,13 @@ and a module that exposes a RESTful API server that also gives access to the sto
 because he wishes to add it to stock_exchange, this can be done in one step, if he also provides said stock_exchange<br />
 object. In the case he or she just wants to create a stock, independently of a stock exchange, he can also do that by<br />
 not providing this particular parameter. This can be useful if for example he just wants to calculate the dividend yield<br />
-of that stock.<br />
+of that stock. The stock_type is implemented as an enum, since there are only two standard available "common or preferred".<br />
 
     For the Trade class the stock_exchange object parameter is required since a trade can only happen inside a stock<br />
 exchange. So, during object creation, it is also automatically registered to the provided stock exchange. Also, there<br />
 is also a check implemented that will not allow a trade for a non existing stock to be registered in the stock exchange,<br />
 since this would not make any sense. Lastly, there is an optional time_stamp parameter that corresponds to the time the<br />
-trade occurred. If the user doesn't provide one, then the current time stamp will be automatically provided.<br />
+trade occurred. If the user doesn't provide one, then the current time stamp will be automatically provided. The trade_type<br />is implemented as an enum, since there are only two standard available "buy or sell".<br />
 
     If the user asks for a function that has prerequisites, the console API will automatically guide him with<br />
 informative prompts to first provide the required data in a specific format and then execute the function he requested.<br />
