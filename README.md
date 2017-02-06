@@ -1,6 +1,6 @@
-SuperSimpleStocks__
-__
-__
+SuperSimpleStocks<br />
+<br />
+<br />
 Description:__
     A simple application that simulates a stock exchange. It has the ability to create and register stocks (Stock class)
 and trades (TradeRecord class) for these stocks in a stock exchange object. The class 'stock_exchange' contains
