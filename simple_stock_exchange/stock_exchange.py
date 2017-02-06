@@ -279,7 +279,7 @@ class StockExchange(object):
             # Checking if the stock_price is valid
             validated_price = StockExchange.is_stock_price_valid(stock_price)
             if validated_price:
-
+                denominator = 0.0
                 # Checking the type of the stock to use the correct equation.
                 if current_stock.stock_type == 'common':
                     logger.debug('Calculating dividend, for common stock type.')

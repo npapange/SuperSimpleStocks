@@ -11,7 +11,7 @@ __author__ = 'Nikitas Papangelopoulos'
 A simple script to run all tests.
 """
 
-logging.config.fileConfig('/logging.conf', disable_existing_loggers=False)
+logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 
 suite = unittest.TestSuite()
 

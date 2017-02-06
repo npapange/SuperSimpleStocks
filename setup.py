@@ -9,6 +9,7 @@ setup(
                 'simple_stock_exchange.stock_exchange'],
     package_data={'simple_stock_exchange': ['logging.conf', 'requirements.txt'],
                   'api': ['logging.conf', 'requirements.txt']},
+    test_suite="tests",
     data_files=[('simple_stock_exchange', ['requirements.txt'])],
     url='https://github.com/npapange/SuperSimpleStocks',
     author='Nikitas Papangelopoulos',
