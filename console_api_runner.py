@@ -11,7 +11,7 @@ __author__ = 'Nikitas Papangelopoulos'
 A script to run console_api.
 """
 
-logging.config.fileConfig('/SuperSimpleStocks/logging.conf', disable_existing_loggers=False)
+logging.config.fileConfig('simple_stock_exchange/logging.conf', disable_existing_loggers=False)
 
 # Getting the user's input.
 parser = argparse.ArgumentParser(

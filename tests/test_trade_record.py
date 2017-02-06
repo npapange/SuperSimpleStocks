@@ -8,7 +8,7 @@ from datetime import datetime
 
 __author__ = 'Nikitas Papangelopoulos'
 
-logging.config.fileConfig('/SuperSimpleStocks/logging.conf', disable_existing_loggers=False)
+logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 
 
 class TestTrade(unittest.TestCase):
