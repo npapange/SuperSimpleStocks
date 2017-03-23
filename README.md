@@ -25,22 +25,22 @@ object. In the case he or she just wants to create a stock, independently of a s
 not providing this particular parameter. This can be useful if for example he just wants to calculate the dividend yield<br />
 of that stock. The stock_type is implemented as an enum, since there are only two standard available "common or preferred".<br />
 
-    For the Trade class the stock_exchange object parameter is required since a trade can only happen inside a stock<br />
+For the Trade class the stock_exchange object parameter is required since a trade can only happen inside a stock <br />
 exchange. So, during object creation, it is also automatically registered to the provided stock exchange. Also, there<br />
 is also a check implemented that will not allow a trade for a non existing stock to be registered in the stock exchange,<br />
 since this would not make any sense. Lastly, there is an optional time_stamp parameter that corresponds to the time the<br />
 trade occurred. If the user doesn't provide one, then the current time stamp will be automatically provided. The trade_type<br />is implemented as an enum, since there are only two standard available "buy or sell".<br />
 
-    If the user asks for a function that has prerequisites, the console API will automatically guide him with<br />
+If the user asks for a function that has prerequisites, the console API will automatically guide him with <br />
 informative prompts to first provide the required data in a specific format and then execute the function he requested.<br />
 In a similar case the REST API will return an error message, detailing the missing data.<br />
 
-    All time stamps where ever they are used, need to be in teh following format: 2017-02-05 22:14:39.<br />
+All time stamps where ever they are used, need to be in teh following format: 2017-02-05 22:14:39.<br />
     
-    Numpy is used for most calculations because it is faster than Python and has many convenience methods that<br />
+Numpy is used for most calculations because it is faster than Python and has many convenience methods that<br />
 simplify tasks.<br />
 
-    The logging configuration is located in the "logging.conf" file. It prints messages in the console as well as saves<br />
+The logging configuration is located in the "logging.conf" file. It prints messages in the console as well as saves<br />
 the log messages in a file called Stocks.log. So as to not "bombard" the user with two many logging information, the log<br />
 level for the console output is set to "INFO", whereas for the log file it is set to "DEBUG", so that all statements are<br />
 saved in a file.<br />
