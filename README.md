@@ -64,7 +64,7 @@ that can be used to independently install all required packages by running the c
           (at the default base URL http://127.0.0.1:5000/) that can accept POST json requests to URLs that correspond to<br />
           the stock_exchange module's methods.<br />
           
-    More information and additional details on usage can be found in the doc strings.<br />
+More information and additional details on usage can be found in the doc strings.<br />
 <br />
 <br />
 <b>Tests:</b><br /><br />
